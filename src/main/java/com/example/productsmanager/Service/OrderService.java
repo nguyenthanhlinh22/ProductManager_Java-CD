@@ -40,18 +40,20 @@ public class OrderService {
             return "Định dạng ngày không đúng. Vui lòng nhập theo định dạng yyyy-MM-dd.";
         }
 
-        if (start.isBefore(LocalDate.now())) {
-            return "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.";
-        }
+        // Loại bỏ kiểm tra ngày bắt đầu lớn hơn hoặc bằng ngày hiện tại
+        // if (start.isBefore(LocalDate.now())) {
+        //     return "Ngày bắt đầu phải lớn hơn hoặc bằng ngày hiện tại.";
+        // }
 
         if (!end.isAfter(start)) {
-            return "Ngày kết thúc phải lớn hơn ngày bắt đầu.";
+            return "Ngày kết thúc phải lớn hơn hoặc bằng ngày bắt đầu.";
         }
 
         List<Order> orders = orderRepository.findByNgayMuaBetween(start.atStartOfDay(), end.atTime(23, 59, 59));
         model.addAttribute("orders", orders);
         return null; // Không có lỗi
     }
+
 
     public List<Order> getTopOrders(int topCount) {
         List<Order> orders = orderRepository.findAll();

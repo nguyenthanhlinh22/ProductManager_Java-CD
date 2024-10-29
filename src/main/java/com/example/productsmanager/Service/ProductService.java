@@ -26,6 +26,10 @@ public class ProductService {
     public Product addProduct(Product product) {
         return productRepository.save(product);
     }
+    public Product findById(Long id) {
+        return productRepository.findById(id)
+                .orElse(null); // Hoặc throw một exception nếu không tìm thấy
+    }
 
     // Cập nhật sản phẩm
     public Product updateProduct(Long id, Product updatedProduct) {
@@ -44,4 +48,12 @@ public class ProductService {
     public void deleteProduct(Long id) {
         productRepository.deleteById(id);
     }
+
+    // ProductService.java
+    public List<Product> getProductsByType(Long maLoaiSp) {
+        return productRepository.findByLoaiSanPham_MaLoaiSp(maLoaiSp);
+    }
+
+
+
 }

@@ -2,8 +2,10 @@ package com.example.productsmanager.Controller;
 
 import com.example.productsmanager.Model.Order;
 import com.example.productsmanager.Model.Product; // Thêm import cho Product
+import com.example.productsmanager.Model.ProductType;
 import com.example.productsmanager.Service.OrderService;
 import com.example.productsmanager.Service.ProductService; // Thêm import cho ProductService
+import com.example.productsmanager.Service.ProductTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +20,10 @@ public class OrderController {
     private OrderService orderService;
 
     @Autowired
-    private ProductService productService; // Khai báo ProductService
+    private ProductService productService;
+    @Autowired
+    private ProductTypeService productTypeService; // Khai báo ProductService
+// Khai báo ProductService
 
     // Hiển thị danh sách tất cả các đơn hàng
     @GetMapping
@@ -52,26 +57,36 @@ public class OrderController {
     @GetMapping("/edit")
     public String editOrder(@RequestParam Long maDonHang, Model model) {
         Order order = orderService.getOrderById(maDonHang);
+        List<ProductType> productTypes = productTypeService.getAllProductTypes();
+
         model.addAttribute("order", order);
-        return "editOrder";
+        model.addAttribute("productTypes", productTypes);
+
+        return "editOrder"; // View sẽ là editOrder.html
     }
+
+
+
 
     @PostMapping("/update")
     public String updateOrder(@ModelAttribute Order order) {
-        // Tìm sản phẩm dựa trên tên sản phẩm
-        Product product = productService.findByName(order.getSanPham().getTenSp());
-
+        Product product = productService.findById(order.getSanPham().getMaSp()); // Tìm sản phẩm theo ID
         if (product == null) {
-            // Nếu sản phẩm không tồn tại, trả về thông báo lỗi
+            System.out.println("Sản phẩm không tồn tại!");
             return "redirect:/orders?error=Sản phẩm không tồn tại!";
         }
-
-        // Gán sản phẩm đã tìm thấy cho đơn hàng
         order.setSanPham(product);
-
-        // Cập nhật thông tin đơn hàng
         orderService.updateOrder(order.getMaDonHang(), order);
-
-        return "redirect:/orders"; // Chuyển hướng về danh sách đơn hàng
+        System.out.println("Cập nhật thành công, chuyển hướng về danh sách đơn hàng.");
+        return "redirect:/orders";
     }
+
+
+
+    @GetMapping("/byType/{maLoaiSp}")
+    @ResponseBody
+    public List<Product> getProductsByType(@PathVariable Long maLoaiSp) {
+        return productService.getProductsByType(maLoaiSp);
+    }
+
 }
